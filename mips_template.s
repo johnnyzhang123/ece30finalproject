@@ -81,9 +81,38 @@ medianOfThree:
 	# Make this the first element of the list by swapping
 
 	### INSERT YOUR CODE HERE
-
+	addiu $sp, $sp, -24 # Allocate space for return address
+	sw $ra, 8($sp) # Push return address onto stack
+	sw $fp,4($sp)
+	sw $a1,12($sp)
+	sw $a2,16($sp)
+	sw $a0,20($sp)
+	addiu $fp,$sp,24
+	#Opertation begins
+	sll $t1, $a1,2
+	sll $t2, $a2,2
+	add $t1,$a0,$t1
+	add $t2,$a0,$t2
+	lw $t3,0($t1)
+	lw $t4,0($t2)
+	add $t0,$t3,$t4
+	srl $t0,$t0,2
+	mflo $t0#round down 
+	slt $t5, $t4,$t3
+	bne $t5,$zero, case1
+case1: 	add $a0, $a0,0
+	add $a1, $a1,0
+	add $a2, $a2,0
+	jal swap
+	j exit
+	slt $t5, $t4,$t0
+	bne $t5,$zero, case2
+case2:  
+	slt $t5
+	
 	# return to caller
-	jr $ra
+	
+exit:   jr $ra
 
 
 ########################
