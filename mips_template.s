@@ -89,26 +89,29 @@ medianOfThree:
 	sw $a0,20($sp)
 	addiu $fp,$sp,24
 	#Opertation begins
-	sll $t1, $a1,2
-	sll $t2, $a2,2
-	add $t1,$a0,$t1
-	add $t2,$a0,$t2
-	lw $t3,0($t1)
-	lw $t4,0($t2)
-	add $t0,$t3,$t4
-	srl $t0,$t0,2
+	sll $t1, $a1,2#multiply a1 by 4
+	sll $t2, $a2,2 #multiply a2 by 4
+	add $t1,$a0,$t1#get location for x[a1]
+	add $t2,$a0,$t2#location for x[a2]
+	add $t0,$a1,$a2#a1+a2/2
+	sra $t0,$t0,1#shift right arithmetic to sign extend the value
 	mflo $t0#round down 
-	slt $t5, $t4,$t3
-	bne $t5,$zero, case1
+	sll $t0,$t0,2#multiply mid by4
+	add $t0, $a0, $t0#address for x[mid]
+	lw $t3,0($t1)#access value of x[lo]
+	lw $t4,0($t2)#access value of x[hi]
+	lw $t5,0($t0)#access value of x[mid]
+	slt $t6, $t4,$t3
+	bne $t6,$zero, case1
 case1: 	add $a0, $a0,0
 	add $a1, $a1,0
 	add $a2, $a2,0
 	jal swap
 	j exit
-	slt $t5, $t4,$t0
-	bne $t5,$zero, case2
+	slt $t6, $t4,$t0
+	bne $t6,$zero, case2
 case2:  
-	slt $t5
+	slt $t6
 	
 	# return to caller
 	
