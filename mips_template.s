@@ -96,38 +96,44 @@ medianOfThree:
 	
 	#get location for x[mid] as 
 	add $t0,$a1,$a2#a1+a2/2
-	sra $t0,$t0,1#shift right arithmetic to sign extend the value
+	srl $t0,$t0,1#shift right arithmetic to sign extend the value
 	mflo $t0#round down 
+	add $t8, $t0, $zero# t8 contains the real mid value
 	sll $t0,$t0,2#multiply mid by4
 	add $t6, $a0, $t0#address for x[mid]
 	
 	lw $t3,0($t1)#access value of x[lo]
 	lw $t4,0($t2)#access value of x[hi]
-	lw $t5,0($t0)#access value of x[mid]
+	lw $t5,0($t6)#access value of x[mid]
 	slt $t7, $t4,$t3
-	bne $t7,$zero, case1
-	slt $t7, $t4,$t0
-	bne $t7,$zero, case2
-	slt $t7, $t0,$t3
+	bne $t7,$zero, case1	
+case1:  addi $a1, $a1,0
+	addi $a2, $a2,0
+	jal swap
+	lw $a0, 20($sp)
+	lw $a1, 12($sp)
+	lw $a2, 16($sp)
+	slt $t7, $t4,$t5
+	bne $t7,$zero, case2	
+case2:  addi $a1, $t8,0
+	addi $a2, $a2,0
+	jal swap
+	lw $a0, 20($sp)
+	lw $a1, 12($sp)
+	lw $a2, 16($sp)
+	slt $t7, $t5,$t3
 	bne $t7,$zero, case3
-	
-case1: 	addi $a0, $a0,0
-	addi $a1, $a1,0
-	addi $a2, $a2,0
+case3:  addi $a1, $a1,0
+	addi $a2, $t8,0
 	jal swap
-	j exit
-	
-case2:  addi $a0, $a0,0
-	addi $a1, $t0,0
-	addi $a2, $a2,0
-	jal swqp
-	j exit 
-	
-case3:	addi $a0, $a0,0
-	addi $a1, $a1,0
-	addi $a2, $t0,0
-	jal swap
-	j exit
+	lw $a0, 20($sp)
+	lw $a1, 12($sp)
+	lw $a2, 16($sp)
+ 	addi $a1, $a1,0
+	addi $a2, $t8,0
+	lw $a0, 20($sp)
+	lw $a1, 12($sp)
+	lw $a2, 16($sp)
 	
 	# return to caller	
 exit:   jr $ra
