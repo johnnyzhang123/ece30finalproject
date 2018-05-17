@@ -83,38 +83,53 @@ medianOfThree:
 	### INSERT YOUR CODE HERE
 	addiu $sp, $sp, -24 # Allocate space for return address
 	sw $ra, 8($sp) # Push return address onto stack
-	sw $fp,4($sp) #push frame pointer to stack
-	sw $a1,12($sp) #push parameters to stack
+	sw $fp,4($sp)
+	sw $a1,12($sp)
 	sw $a2,16($sp)
 	sw $a0,20($sp)
-	addiu $fp,$sp,24 # end caller's responsiblity 
+	addiu $fp,$sp,24
 	#Opertation begins
 	sll $t1, $a1,2#multiply a1 by 4
 	sll $t2, $a2,2 #multiply a2 by 4
-	add $t1,$a0,$t1#get location for x[a1]
-	add $t2,$a0,$t2#location for x[a2]
+	add $t1,$a0,$t1#get location for x[a1]=x[lo]
+	add $t2,$a0,$t2#get location for x[a2]=x[hi]
+	
+	#get location for x[mid] as 
 	add $t0,$a1,$a2#a1+a2/2
 	sra $t0,$t0,1#shift right arithmetic to sign extend the value
 	mflo $t0#round down 
 	sll $t0,$t0,2#multiply mid by4
-	add $t0, $a0, $t0#address for x[mid]
+	add $t6, $a0, $t0#address for x[mid]
+	
 	lw $t3,0($t1)#access value of x[lo]
 	lw $t4,0($t2)#access value of x[hi]
 	lw $t5,0($t0)#access value of x[mid]
-	slt $t6, $t4,$t3 #compare x[lo] and x[hi]
-	bne $t6,$zero, case1 # if x[hi]< x[lo]
-case1: 	add $a0, $a0,0
-	add $a1, $a1,0
-	add $a2, $a2,0
+	slt $t7, $t4,$t3
+	bne $t7,$zero, case1
+	slt $t7, $t4,$t0
+	bne $t7,$zero, case2
+	slt $t7, $t0,$t3
+	bne $t7,$zero, case3
+	
+case1: 	addi $a0, $a0,0
+	addi $a1, $a1,0
+	addi $a2, $a2,0
 	jal swap
 	j exit
-	slt $t6, $t4,$t0
-	bne $t6,$zero, case2
-case2:  
-	slt $t6
 	
-	# return to caller
+case2:  addi $a0, $a0,0
+	addi $a1, $t0,0
+	addi $a2, $a2,0
+	jal swqp
+	j exit 
 	
+case3:	addi $a0, $a0,0
+	addi $a1, $a1,0
+	addi $a2, $t0,0
+	jal swap
+	j exit
+	
+	# return to caller	
 exit:   jr $ra
 
 
@@ -131,6 +146,7 @@ partition:
 	# Separate the list into two sections based on the pivot value
 
 	### INSERT YOUR CODE HERE
+	
 
 	# return to caller
 	jr $ra
