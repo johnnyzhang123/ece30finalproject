@@ -101,8 +101,8 @@ medianOfThree:
 	lw $t3,0($t1)#access value of x[lo]
 	lw $t4,0($t2)#access value of x[hi]
 	lw $t5,0($t0)#access value of x[mid]
-	slt $t6, $t4,$t3 #compare
-	bne $t6,$zero, case1
+	slt $t6, $t4,$t3 #compare x[lo] and x[hi]
+	bne $t6,$zero, case1 # if x[hi]< x[lo]
 case1: 	add $a0, $a0,0
 	add $a1, $a1,0
 	add $a2, $a2,0
