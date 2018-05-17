@@ -83,11 +83,11 @@ medianOfThree:
 	### INSERT YOUR CODE HERE
 	addiu $sp, $sp, -24 # Allocate space for return address
 	sw $ra, 8($sp) # Push return address onto stack
-	sw $fp,4($sp)
-	sw $a1,12($sp)
+	sw $fp,4($sp) #push frame pointer to stack
+	sw $a1,12($sp) #push parameters to stack
 	sw $a2,16($sp)
 	sw $a0,20($sp)
-	addiu $fp,$sp,24
+	addiu $fp,$sp,24 # end caller's responsiblity 
 	#Opertation begins
 	sll $t1, $a1,2#multiply a1 by 4
 	sll $t2, $a2,2 #multiply a2 by 4
@@ -101,7 +101,7 @@ medianOfThree:
 	lw $t3,0($t1)#access value of x[lo]
 	lw $t4,0($t2)#access value of x[hi]
 	lw $t5,0($t0)#access value of x[mid]
-	slt $t6, $t4,$t3
+	slt $t6, $t4,$t3 #compare
 	bne $t6,$zero, case1
 case1: 	add $a0, $a0,0
 	add $a1, $a1,0
