@@ -68,8 +68,9 @@ swap:
 	sw $t3,0($t2)#store value in t3 to t2
 	# return to caller
 	jr $ra
-
-
+	##############################
+	#SWAP TEST SUCCESSFUL
+	#########################
 ########################
 #   medianOfThree      #
 ########################
@@ -106,24 +107,24 @@ medianOfThree:
 	lw $t4,0($t2)#access value of x[hi]
 	lw $t5,0($t6)#access value of x[mid]
 	slt $t7, $t4,$t3
-	bne $t7,$zero, case1	
-case1:  addi $a1, $a1,0
+	bne $t7,$zero, case1Med	
+case1Med:  addi $a1, $a1,0
 	addi $a2, $a2,0
 	jal swap
 	lw $a0, 20($sp)
 	lw $a1, 12($sp)
 	lw $a2, 16($sp)
 	slt $t7, $t4,$t5
-	bne $t7,$zero, case2	
-case2:  addi $a1, $t8,0
+	bne $t7,$zero, case2Med	
+case2Med:  addi $a1, $t8,0
 	addi $a2, $a2,0
 	jal swap
 	lw $a0, 20($sp)
 	lw $a1, 12($sp)
 	lw $a2, 16($sp)
 	slt $t7, $t5,$t3
-	bne $t7,$zero, case3
-case3:  addi $a1, $a1,0
+	bne $t7,$zero, case3Med
+case3Med:  addi $a1, $a1,0
 	addi $a2, $t8,0
 	jal swap
 	lw $a0, 20($sp)
@@ -142,8 +143,10 @@ case3:  addi $a1, $a1,0
 	lw $a0,20($sp)
 	addiu $sp, $sp, 24 #clear up stack and return everything in position for caller
 	# return to caller	
-exit:   jr $ra
-
+   jr $ra
+   ##############################################
+   #MEDIAN OF THREE TEST FAILED
+   ##################################################
 
 ########################
 #      partition       #
@@ -171,22 +174,24 @@ partition:
 	add $t1, $a0, $t1
 	lw $t2, 0($t1)
 	slt $t0, $a1, $a2#compare left and right
-	beq $t0,$zero, case1
+	beq $t0,$zero, case1Part
 	slt $t0, $a3, $t2#compare x[left] and pivot
-	bne $t0, $zero, case2
+	bne $t0, $zero, case2Part
 	j else
-case1:  addi $v0, $a1,0
-	j exit
-case2:	subi $a2,$a2,1
+case1Part:  
+	addi $v0, $a1,0
+	j exitPart
+case2Part:	
+	addi $a2,$a2,-1
 	jal swap 
 	jal partition 
 	lw $a2, 20($sp)
-	j exit
+	j exitPart
 else:	addi $a1, $a1,1 
 	jal partition
 	lw $a1, 16($sp)
 
-exit:	lw $ra, 4($sp) # Push return address onto stack
+exitPart:	lw $ra, 4($sp) # Push return address onto stack
 	lw $fp,8($sp)
 	lw $a0,12($sp)
 	lw $a1,16($sp)
@@ -195,7 +200,9 @@ exit:	lw $ra, 4($sp) # Push return address onto stack
 	addiu $sp, $sp, 28
 	# r eturn to caller
 	jr $ra
-	
+	########################################
+	#YET TO TEST
+	#########################################
 
 ########################
 #      quickSort       #
@@ -222,19 +229,19 @@ quickSort:
 	addi $t2, $zero,2
 	sub $t3, $a2, $a1
 	slt $t4, $t2,$t3
-	beq $t4,$zero,exit
+	beq $t4,$zero,exitQuick
 	
-	jal medianofthree
+	jal medianOfThree
 	
 	addi $a3, $t1,0
 
 	addi $a1,$a1,1#first+1
 	jal partition#partition(x,first+1,last, pivot)
-	subi $a2, $v0,1#index= previous result -1 
+	addi $a2, $v0,-1  #index= previous result -1 
 	lw $a1,16($sp)#restore first
 	jal swap#swap(x,first,index)
 	
-	subi $a2,$a2,1#index=index-1
+	addi $a2,$a2,-1 #index=index-1
 	jal quickSort#quickSort(x,first,index-1)
 	addi $a2,$a2,1#index-1+1
 	
@@ -242,7 +249,7 @@ quickSort:
 	lw $a2, 20($sp)#change from index to last
 	jal quickSort#quickSort(x,index+1,last)
 
-exit:	lw $ra, 8($sp) # Push return address onto stack
+exitQuick:	lw $ra, 8($sp) # Push return address onto stack
 	lw $fp,4($sp)
 	lw $a0,12($sp)
 	lw $a1,16($sp)
@@ -253,6 +260,9 @@ exit:	lw $ra, 8($sp) # Push return address onto stack
 	# return to caller
 	jr $ra
 
+	##########################################################
+	#QUICK SORT TEST FAILED
+	###########################################################
 
 ########################
 #      printList       #
