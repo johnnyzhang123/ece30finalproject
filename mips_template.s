@@ -134,7 +134,13 @@ case3:  addi $a1, $a1,0
 	lw $a0, 20($sp)
 	lw $a1, 12($sp)
 	lw $a2, 16($sp)
-	
+	addiu $fp,$sp,-24 #push back fp to original position
+	lw $ra, 8($sp) # Push return address onto stack
+	lw $fp,4($sp)
+	lw $a1,12($sp)
+	lw $a2,16($sp)
+	lw $a0,20($sp)
+	addiu $sp, $sp, 24 #clear up stack and return everything in position for caller
 	# return to caller	
 exit:   jr $ra
 
@@ -204,3 +210,4 @@ pnext:	addi $t0,$t0,4
 	la $a0,comma
 	syscall			# Print comma
 	j next
+
