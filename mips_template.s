@@ -134,7 +134,7 @@ case3:  addi $a1, $a1,0
 	lw $a0, 20($sp)
 	lw $a1, 12($sp)
 	lw $a2, 16($sp)
-	addiu $fp,$sp,-24 #push back fp to original position
+
 	lw $ra, 8($sp) # Push return address onto stack
 	lw $fp,4($sp)
 	lw $a1,12($sp)
@@ -158,9 +158,42 @@ partition:
 	# Separate the list into two sections based on the pivot value
 
 	### INSERT YOUR CODE HERE
+	addiu $sp, $sp, -28 # Allocate space for return address
+	sw $ra, 4($sp) # Push return address onto stack
+	sw $fp,8($sp)
+	sw $a0,12($sp)
+	sw $a1,16($sp)
+	sw $a2,20($sp)
+	sw $a3,24($sp)
+	addiu $fp,$sp,28
 	
+	sll $t1, $a1,2
+	add $t1, $a0, $t1
+	lw $t2, 0($t1)
+	slt $t0, $a1, $a2#compare left and right
+	beq $t0,$zero, case1
+	slt $t0, $a3, $t2#compare x[left] and pivot
+	bne $t0, $zero, case2
+	j else
+case1:  addi $v0, $a1,0
+	j exit
+case2:	subi $a2,$a2,1
+	jal swap 
+	jal partition 
+	lw $a2, 20($sp)
+	j exit
+else:	addi $a1, $a1,1 
+	jal partition
+	lw $a1, 16($sp)
 
-	# return to caller
+exit:	lw $ra, 4($sp) # Push return address onto stack
+	lw $fp,8($sp)
+	lw $a0,12($sp)
+	lw $a1,16($sp)
+	lw $a2,20($sp)
+	lw $a3,24($sp)
+	addiu $sp, $sp, 28
+	# r eturn to caller
 	jr $ra
 	
 
@@ -174,6 +207,48 @@ quickSort:
 	# Sort the list using recursive quick sort using the above functions
 
 	### INSERT YOUR CODE HERE
+	addiu $sp, $sp, -24 # Allocate space for return address
+	sw $ra, 8($sp) # Push return address onto stack
+	sw $fp,4($sp)
+	sw $a0,12($sp)
+	sw $a1,16($sp)
+	sw $a2,20($sp)
+	addiu $fp,$sp,24
+	
+	sll $t0, $a1,2
+	add $t0,$a0,$t0
+	lw $t1,0($t0)
+
+	addi $t2, $zero,2
+	sub $t3, $a2, $a1
+	slt $t4, $t2,$t3
+	beq $t4,$zero,exit
+	
+	jal medianofthree
+	
+	addi $a3, $t1,0
+
+	addi $a1,$a1,1#first+1
+	jal partition#partition(x,first+1,last, pivot)
+	subi $a2, $v0,1#index= previous result -1 
+	lw $a1,16($sp)#restore first
+	jal swap#swap(x,first,index)
+	
+	subi $a2,$a2,1#index=index-1
+	jal quickSort#quickSort(x,first,index-1)
+	addi $a2,$a2,1#index-1+1
+	
+	addi $a1,$a2,1# change first to index+1
+	lw $a2, 20($sp)#change from index to last
+	jal quickSort#quickSort(x,index+1,last)
+
+exit:	lw $ra, 8($sp) # Push return address onto stack
+	lw $fp,4($sp)
+	lw $a0,12($sp)
+	lw $a1,16($sp)
+	lw $a2,20($sp)
+	addiu $sp,$sp,24
+
 
 	# return to caller
 	jr $ra
