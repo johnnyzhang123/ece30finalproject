@@ -10,7 +10,7 @@
 
 
 .data 
-array:	.word 5, 8, 1, 9, 3, 4, 2, 6
+array:	.word 4 0 -9 1 -3 5
 
 init:	.asciiz "The initial array is: "
 final:	.asciiz "The sorted array is: "
@@ -28,19 +28,19 @@ main:
 	# Print the array
 	la $a0,array
 	la $a1,init
-	li $a2,8
+	li $a2,6
 	jal printList
 
 	# Quicksort
 	la $a0,array
 	li $a1,0
-	li $a2,7
-	jal quickSort
+	li $a2,4
+	jal medianOfThree
 
 	# Print the sorted array
 	la $a0,array
 	la $a1,final
-	li $a2,8
+	li $a2,6
 	jal printList
 
 
@@ -58,20 +58,19 @@ swap:
 	# Swap the elements at the given indices in the list
 
 	### INSERT YOUR CODE HERE
-	sll $s1, $a1, 2  	#multiply index 1 by 4
-	sll $s2, $a2, 2 	#multiply index 2 by 4
-	add $s1, $s1, $a0 	#access the value that is stored in a1
-	add $s2, $s2, $a0	#access value in a2
-	lw $t3, 0($s1) 		#store value in t1 to t3
-	lw $t4, 0($s2)		#store value in t2 to t4
-	sw $t4, 0($s1)		#store value in t4 to t1
-	sw $t3, 0($s2)		#store value in t3 to t2
+	sll $t1,$a1,2  #multiply a1 by 4
+	sll $t2, $a2,2 #multiply a2 by 4
+	add $t1 $t1,$a0 #access the value that is stored in a1
+	add $t2, $t2,$a0# access value in a2
+	lw $t3,0($t1) #store value in t1 to t3
+	lw $t4,0($t2)# store value in t2 to t4
+	sw $t4,0($t1)#store value in t4 to t1
+	sw $t3,0($t2)#store value in t3 to t2
 	# return to caller
 	jr $ra
 	##############################
 	#SWAP TEST SUCCESSFUL
 	#########################
-	
 ########################
 #   medianOfThree      #
 ########################
@@ -84,69 +83,82 @@ medianOfThree:
 
 	### INSERT YOUR CODE HERE
 	addiu $sp, $sp, -24 # Allocate space for return address
-	sw $ra, 20($sp) 	#Push return address onto stack
-	sw $fp, 16($sp)
-	sw $s1, 12($sp)
-	sw $s2,  8($sp)
-	sw $s0,  4($sp)		
-	addiu $fp, $sp, 24
-	
+	sw $ra, 8($sp) # Push return address onto stack
+	sw $fp,4($sp)
+	sw $a1,12($sp)
+	sw $a2,16($sp)
+	sw $a0,20($sp)
+	addiu $fp,$sp,24
 	#Opertation begins
-	sll $s1, $a1, 2		#Multiply a1 by 4
-	sll $s2, $a2, 2		#Multiply a2 by 4
-	move $s0, $a0		#Base address stored in $s0
-	add $s1, $s0, $s1	#Get address for x[a1]=x[lo]
-	add $s2, $s0, $s2	#Get address for x[a2]=x[hi]
-	lw $t1, 0($s1)		#Get element of lo
-	lw $t2, 0($s2)		#Get element of hi
-	
-	#Get address for x[mid] 
-	add $t0, $t1, $t2	#(lo element + hi element)
-	srl $t0, $t0, 1		#shift right arithmetic to sign extend the value
-	mflo $t0		#round down 
-	
-	slt $t3, $t1, $t2	#compare x[lo] with x[hi]
-	bne $t7, $zero, case1Med	
-	
-case1Med:  
-	addi $a1, $t1,0
-	addi $a2, $t2,0
-	jal swap
-	lw $a1, 12($sp)
-	lw $a2,  8($sp)
-	lw $a0,  4($sp)		
-	slt $t3, $t2, $t0	#compare x[hi] with x[mid]
-	bne $t3 ,$zero, case2Med	
-case2Med:  
-	addi $a1, $t0,0
-	addi $a2, $t2,0
-	jal swap
-	lw $a1, 12($sp)
-	lw $a2,  8($sp)
-	lw $a0,  4($sp)
-	slt $t3, $t0, $t1	#compare x[mid] with x[lo]
-	bne $t3, $zero, case3Med
-case3Med:  
-	addi $a1, $t1,0
-	addi $a2, $t0,0
-	jal swap
-	lw $a1, 12($sp)
-	lw $a2,  8($sp)
-	lw $a0,  4($sp)
-	
- 	addi $a1, $t1, 0
-	addi $a2, $t0, 0
-	jal swap
+	add $t0,$a1,$a2#a1+a2/2
+	srl $t0,$t0,1#shift right arithmetic to sign extend the value
+	mflo $t0#round down 
+	addi $t7, $t0, 0# t7 contains the real mid value
 
-	lw $ra, 20($sp) 	
-	lw $fp, 16($sp)
-	lw $a1, 12($sp)
-	lw $a2,  8($sp)
-	lw $a0,  4($sp)		
-	addiu $fp, $sp, 24
+	sll $t1, $a1,2 #multiply a1 by 4
+	sll $t2, $a2,2 #multiply a2 by 4
+	sll $t0,$t0,2 #multiply mid by4
+	add $t1,$a0,$t1#address for x[lo]
+	add $t2,$a0,$t2#address for x[hi]
+	add $t0, $a0, $t0#address for x[mid]
+	lw $t3,0($t1)#access value of x[lo]
+	lw $t4,0($t2)#access value of x[hi]
+	lw $t5,0($t0)#access value of x[mid]
 	
+
+	#comparison begins
+	slt $t8, $t4,$t3
+	bne $t8,$zero, case1Med	
+	j case2Med# if the statement is false go to the next condition
+case1Med:  
+	addi $a1, $a1,0
+	addi $a2, $a2,0
+	jal swap
+	#lw $a0, 20($sp)
+	#lw $a1, 12($sp)
+	#lw $a2, 16($sp)
+
+
+case2Med:  
+	#third step
+	slt $t8, $t4,$t5
+	beq $t8,$zero, case3Med	
+	addi $a1, $t7,0
+	addi $a2, $a2,0
+	jal swap
+#	lw $a0, 20($sp)
+	#lw $a1, 12($sp)
+#	lw $a2, 16($sp)
+
+	#fouth step
+
+case3Med:  
+	slt $t8, $t5,$t3
+	beq $t8,$zero, case4Med
+	addi $a1, $a1,0
+	addi $a2, $t7,0
+	jal swap
+	#lw $a0, 20($sp)
+	#lw $a1, 12($sp)
+	#lw $a2, 16($sp)
+
+case4Med:	
+	#last step
+ 	addi $a1, $a1,0
+	addi $a2, $t7,0
+	jal swap	
+	#lw $a0, 20($sp)
+	#lw $a1, 12($sp)
+	#lw $a2, 16($sp)
+
+	lw $ra, 8($sp) # Push return address onto stack
+	lw $fp,4($sp)
+	#lw $a1,12($sp)
+	#lw $a2,16($sp)
+	#lw $a0,20($sp)
+	addiu $sp, $sp, 24 #clear up stack and return everything in position for caller
 	# return to caller	
-   	jr $ra
+   jr $ra
    ##############################################
    #MEDIAN OF THREE TEST FAILED
    ##################################################
@@ -165,8 +177,8 @@ partition:
 
 	### INSERT YOUR CODE HERE
 	addiu $sp, $sp, -28 # Allocate space for return address
-	sw $ra, 4($sp) # Push return address onto stack
-	sw $fp,8($sp)
+	sw $ra, 8($sp) # Push return address onto stack
+	sw $fp,4($sp)
 	sw $a0,12($sp)
 	sw $a1,16($sp)
 	sw $a2,20($sp)
@@ -194,8 +206,8 @@ else:	addi $a1, $a1,1
 	jal partition
 	lw $a1, 16($sp)
 
-exitPart:	lw $ra, 4($sp) # Push return address onto stack
-	lw $fp,8($sp)
+exitPart:	lw $ra, 8($sp) # Push return address onto stack
+	lw $fp,4($sp)
 	lw $a0,12($sp)
 	lw $a1,16($sp)
 	lw $a2,20($sp)
@@ -227,32 +239,32 @@ quickSort:
 	
 	sll $t0, $a1,2
 	add $t0,$a0,$t0
-	lw $t1,0($t0)
+	lw $t1,0($t0)# load out the element in the first index
 
-	addi $t2, $zero,2
-	sub $t3, $a2, $a1
-	slt $t4, $t2,$t3
-	beq $t4,$zero,exitQuick
+	addi $t2, $zero,2# temp register with value of 2
+	sub $t3, $a2, $a1# check the difference between the two indexes
+	slt $t4, $t2,$t3#if it is less than 2
+	beq $t4,$zero,exitQuick #exit the program because $t4 would be 0
 	
-	jal medianOfThree
+	jal medianOfThree#step 2 
 	
-	addi $a3, $t1,0
+	addi $a3, $t1,0#change pivot to x[first]
 
 	addi $a1,$a1,1#first+1
 	jal partition#partition(x,first+1,last, pivot)
-	addi $a2, $v0,-1  #index= previous result -1 
+	addi $t3,$v0,0# store the return value from partition to t3
+	addi $a2, $t3,-1  #index= previous result -1 
 	lw $a1,16($sp)#restore first
 	jal swap#swap(x,first,index)
 	
-	addi $a2,$a2,-1 #index=index-1
+	addi $a2,$t3,-2 #index=index-1
 	jal quickSort#quickSort(x,first,index-1)
-	addi $a2,$a2,1#index-1+1
-	
-	addi $a1,$a2,1# change first to index+1
-	lw $a2, 20($sp)#change from index to last
-	jal quickSort#quickSort(x,index+1,last)
+	#last step
+	addi $a1, $t3,1#a1= index+1
+	lw $a2,20($sp)
+	jal quickSort
 
-exitQuick:	lw $ra, 8($sp) # Push return address onto stack
+exitQuick:lw $ra, 8($sp) # Push return address onto stack
 	lw $fp,4($sp)
 	lw $a0,12($sp)
 	lw $a1,16($sp)
