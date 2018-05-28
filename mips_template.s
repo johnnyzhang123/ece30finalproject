@@ -229,38 +229,42 @@ quickSort:
 	# Sort the list using recursive quick sort using the above functions
 
 	### INSERT YOUR CODE HERE
-	addiu $sp, $sp, -24 # Allocate space for return address
+	addiu $sp, $sp, -40 # Allocate space for return address
 	sw $ra, 8($sp) # Push return address onto stack
 	sw $fp,4($sp)
 	sw $a0,12($sp)
 	sw $a1,16($sp)
 	sw $a2,20($sp)
-	addiu $fp,$sp,24
+	sw $s0,24($sp)
+	sw $s1,28($sp)
+	sw $s2,32($sp)
+	sw $s4,36($sp)
+	addiu $fp,$sp,40
 	
-	sll $t0, $a1,2
-	add $t0,$a0,$t0
-	lw $t1,0($t0)# load out the element in the first index
+	sll $s0, $a1,2
+	add $s0,$a0,$s0
+	lw $s1,0($s0)# load out the element in the first index
 
-	addi $t2, $zero,2# temp register with value of 2
-	sub $t3, $a2, $a1# check the difference between the two indexes
-	slt $t4, $t2,$t3#if it is less than 2
-	beq $t4,$zero,exitQuick #exit the program because $t4 would be 0
+	addi $s2, $zero,2# temp register with value of 2
+	sub $s3, $a2, $a1# check the difference between the two indexes
+	slt $s4, $s2,$s3#if it is less than 2
+	beq $s4,$zero,exitQuick #exit the program because $t4 would be 0
 	
 	jal medianOfThree#step 2 
 	
-	addi $a3, $t1,0#change pivot to x[first]
+	addi $a3, $s1,0#change pivot to x[first]
 
 	addi $a1,$a1,1#first+1
 	jal partition#partition(x,first+1,last, pivot)
-	addi $t3,$v0,0# store the return value from partition to t3
-	addi $a2, $t3,-1  #index= previous result -1 
+	addi $s3,$v0,0# store the return value from partition to t3
+	addi $a2, $s3,-1  #index= previous result -1 
 	lw $a1,16($sp)#restore first
 	jal swap#swap(x,first,index)
 	
-	addi $a2,$t3,-2 #index=index-1
+	addi $a2,$s3,-2 #index=index-1
 	jal quickSort#quickSort(x,first,index-1)
 	#last step
-	addi $a1, $t3,1#a1= index+1
+	addi $a1, $s3,1#a1= index+1
 	lw $a2,20($sp)
 	jal quickSort
 
@@ -269,7 +273,11 @@ exitQuick:lw $ra, 8($sp) # Push return address onto stack
 	lw $a0,12($sp)
 	lw $a1,16($sp)
 	lw $a2,20($sp)
-	addiu $sp,$sp,24
+	lw $s0,24($sp)
+	lw $s1,28($sp)
+	lw $s2,32($sp)
+	lw $s4,36($sp)
+	addiu $sp,$sp,40
 
 
 	# return to caller
