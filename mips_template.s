@@ -10,7 +10,7 @@
 
 
 .data 
-array:	.word 4 0 -9 1 -3 5
+array:	.word 5 8 9 1 3 4 
 
 init:	.asciiz "The initial array is: "
 final:	.asciiz "The sorted array is: "
@@ -34,8 +34,8 @@ main:
 	# Quicksort
 	la $a0,array
 	li $a1,0
-	li $a2,4
-	jal medianOfThree
+	li $a2,3
+	jal quickSort
 
 	# Print the sorted array
 	la $a0,array
@@ -92,7 +92,7 @@ medianOfThree:
 	#Opertation begins
 	add $t0,$a1,$a2#a1+a2/2
 	srl $t0,$t0,1#shift right arithmetic to sign extend the value
-	mflo $t0#round down 
+	#mflo $t0#round down  #????
 	addi $t7, $t0, 0# t7 contains the real mid value
 
 	sll $t1, $a1,2 #multiply a1 by 4
@@ -114,9 +114,9 @@ case1Med:
 	addi $a1, $a1,0
 	addi $a2, $a2,0
 	jal swap
-	#lw $a0, 20($sp)
-	#lw $a1, 12($sp)
-	#lw $a2, 16($sp)
+	lw $a0, 20($sp)
+	lw $a1, 12($sp)
+	lw $a2, 16($sp)
 
 
 case2Med:  
@@ -126,9 +126,9 @@ case2Med:
 	addi $a1, $t7,0
 	addi $a2, $a2,0
 	jal swap
-#	lw $a0, 20($sp)
-	#lw $a1, 12($sp)
-#	lw $a2, 16($sp)
+	lw $a0, 20($sp)
+	lw $a1, 12($sp)
+	lw $a2, 16($sp)
 
 	#fouth step
 
@@ -138,29 +138,29 @@ case3Med:
 	addi $a1, $a1,0
 	addi $a2, $t7,0
 	jal swap
-	#lw $a0, 20($sp)
-	#lw $a1, 12($sp)
-	#lw $a2, 16($sp)
+	lw $a0, 20($sp)
+	lw $a1, 12($sp)
+	lw $a2, 16($sp)
 
 case4Med:	
 	#last step
  	addi $a1, $a1,0
 	addi $a2, $t7,0
 	jal swap	
-	#lw $a0, 20($sp)
-	#lw $a1, 12($sp)
-	#lw $a2, 16($sp)
+	lw $a0, 20($sp)
+	lw $a1, 12($sp)
+	lw $a2, 16($sp)
 
 	lw $ra, 8($sp) # Push return address onto stack
 	lw $fp,4($sp)
-	#lw $a1,12($sp)
-	#lw $a2,16($sp)
+	lw $a1,12($sp)
+	lw $a2,16($sp)
 	#lw $a0,20($sp)
 	addiu $sp, $sp, 24 #clear up stack and return everything in position for caller
 	# return to caller	
    jr $ra
    ##############################################
-   #MEDIAN OF THREE TEST FAILED
+   #MEDIAN OF THREE TEST SUCCESSFUL
    ##################################################
 
 ########################
@@ -247,8 +247,8 @@ quickSort:
 
 	addi $s2, $zero,2# temp register with value of 2
 	sub $s3, $a2, $a1# check the difference between the two indexes
-	slt $s4, $s2,$s3#if it is less than 2
-	beq $s4,$zero,exitQuick #exit the program because $t4 would be 0
+	slt $s4, $s3,$s2#if it is less than 2
+	bne $s4,$zero,exitQuick #exit the program because $t4 would be 0
 	
 	jal medianOfThree#step 2 
 	
@@ -268,7 +268,7 @@ quickSort:
 	lw $a2,20($sp)
 	jal quickSort
 
-exitQuick:lw $ra, 8($sp) # Push return address onto stack
+	lw $ra, 8($sp) # Push return address onto stack
 	lw $fp,4($sp)
 	lw $a0,12($sp)
 	lw $a1,16($sp)
@@ -279,14 +279,13 @@ exitQuick:lw $ra, 8($sp) # Push return address onto stack
 	lw $s4,36($sp)
 	addiu $sp,$sp,40
 
-
+exitQuick:
 	# return to caller
 	jr $ra
 
 	##########################################################
 	#QUICK SORT TEST FAILED
 	###########################################################
-
 ########################
 #      printList       #
 ########################
