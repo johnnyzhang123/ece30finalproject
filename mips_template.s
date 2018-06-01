@@ -241,10 +241,6 @@ quickSort:
 	sw $s4,36($sp)
 	addiu $fp,$sp,40
 	
-	sll $s0, $a1,2
-	add $s0,$a0,$s0
-	lw $s1,0($s0)# load out the element in the first index
-
 	addi $s2, $zero,2# temp register with value of 2
 	sub $s3, $a2, $a1# check the difference between the two indexes
 	slt $s4, $s3,$s2#if it is less than 2
@@ -252,22 +248,29 @@ quickSort:
 	
 	jal medianOfThree#step 2 
 	
+	lw $a1,16($sp)
+	sll $s0, $a1,2
+	add $s0,$a0,$s0
+	lw $s1,0($s0)# load out the element in the first index	
 	addi $a3, $s1,0#change pivot to x[first]
 
 	addi $a1,$a1,1#first+1
+	lw $a2, 20($sp)
 	jal partition#partition(x,first+1,last, pivot)
-	addi $s3,$v0,0# store the return value from partition to t3
-	addi $a2, $s3,-1  #index= previous result -1 
+	addi $s3,$v0,-1# store the return value from partition to t3 and -1
+	
+	addi $a2, $s3,0 
 	lw $a1,16($sp)#restore first
 	jal swap#swap(x,first,index)
 	
-	addi $a2,$s3,-2 #index=index-1
+	addi $a2,$s3,-1 #index=index-1
+	lw $a1,16($sp)
 	jal quickSort#quickSort(x,first,index-1)
 	#last step
 	addi $a1, $s3,1#a1= index+1
 	lw $a2,20($sp)
 	jal quickSort
-
+exitQuick:
 	lw $ra, 8($sp) # Push return address onto stack
 	lw $fp,4($sp)
 	lw $a0,12($sp)
@@ -279,7 +282,7 @@ quickSort:
 	lw $s4,36($sp)
 	addiu $sp,$sp,40
 
-exitQuick:
+
 	# return to caller
 	jr $ra
 
