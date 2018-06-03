@@ -10,7 +10,7 @@
 
 
 .data 
-array:	.word 5, 8, 1, 9, 3, 4, 2, 6
+array:	.word 5, 8, 9, 1, 3, 4, 2, 6
 init:	.asciiz "The initial array is: "
 final:	.asciiz "The sorted array is: "
 comma:	.asciiz ", "
@@ -83,15 +83,14 @@ medianOfThree:
 	### INSERT YOUR CODE HERE
 	addiu $sp, $sp, -24 # Allocate space for return address
 	sw $ra, 8($sp) # Push return address onto stack
-	sw $fp,4($sp)
-	sw $a1,12($sp)
+	sw $fp,4($sp)#push fp onto stack
+	sw $a1,12($sp)#push parameters onto stack
 	sw $a2,16($sp)
 	sw $a0,20($sp)
-	addiu $fp,$sp,24
+	addiu $fp,$sp,24#move the frame pointer
 	#Opertation begins
 	add $t0,$a1,$a2#a1+a2/2
 	srl $t0,$t0,1#shift right arithmetic to sign extend the value
-	#mflo $t0#round down  #????
 	addi $t7, $t0, 0# t7 contains the real mid value
 
 	sll $t1, $a1,2 #multiply a1 by 4
@@ -106,47 +105,47 @@ medianOfThree:
 	
 
 	#comparison begins
-	slt $t8, $t4,$t3
-	bne $t8,$zero, case1Med	
+	slt $t8, $t4,$t3#if x[hi]<x[lo]
+	bne $t8,$zero, case1Med	#go to case 1 
 	j case2Med# if the statement is false go to the next condition
 case1Med:  
-	addi $a1, $a1,0
-	addi $a2, $a2,0
+	addi $a1, $a1,0#set a1 to lo
+	addi $a2, $a2,0#set a2 to hi
 	jal swap
-	lw $a0, 20($sp)
+	lw $a0, 20($sp)#restore the parameters
 	lw $a1, 12($sp)
 	lw $a2, 16($sp)
 
 
 case2Med:  
 	#third step
-	slt $t8, $t4,$t5
-	beq $t8,$zero, case3Med	
-	addi $a1, $t7,0
-	addi $a2, $a2,0
+	slt $t8, $t4,$t5#see if x[hi]<x[mid]
+	beq $t8,$zero, case3Med	#if not go to step 4
+	addi $a1, $t7,0#set parameter to be mid
+	addi $a2, $a2,0#set parametere as hi
 	jal swap
-	lw $a0, 20($sp)
+	lw $a0, 20($sp)#restore parameters
 	lw $a1, 12($sp)
 	lw $a2, 16($sp)
 
 	#fouth step
 
 case3Med:  
-	slt $t8, $t5,$t3
-	beq $t8,$zero, case4Med
-	addi $a1, $a1,0
-	addi $a2, $t7,0
+	slt $t8, $t5,$t3#if x[mid]<x[lo]
+	beq $t8,$zero, case4Med#if not go to the last step
+	addi $a1, $a1,0#set parameter to lo
+	addi $a2, $t7,0#set paramteer to mid
 	jal swap
-	lw $a0, 20($sp)
+	lw $a0, 20($sp)#restore parameter
 	lw $a1, 12($sp)
 	lw $a2, 16($sp)
 
 case4Med:	
 	#last step
- 	addi $a1, $a1,0
-	addi $a2, $t7,0
+ 	addi $a1, $a1,0#set parameter as lo
+	addi $a2, $t7,0#set parametere as mid
 	jal swap	
-	lw $a0, 20($sp)
+	lw $a0, 20($sp)#restore parameters
 	lw $a1, 12($sp)
 	lw $a2, 16($sp)
 
@@ -154,7 +153,7 @@ case4Med:
 	lw $fp,4($sp)
 	lw $a1,12($sp)
 	lw $a2,16($sp)
-	#lw $a0,20($sp)
+	lw $a0,20($sp)
 	addiu $sp, $sp, 24 #clear up stack and return everything in position for caller
 	# return to caller	
    jr $ra
@@ -177,45 +176,48 @@ partition:
 	### INSERT YOUR CODE HERE
 	addiu $sp, $sp, -28 # Allocate space for return address
 	sw $ra, 8($sp) # Push return address onto stack
-	sw $fp,4($sp)
-	sw $a0,12($sp)
+	sw $fp,4($sp)#push framepointer to stack
+	sw $a0,12($sp)#push parameter to stack
 	sw $a1,16($sp)
 	sw $a2,20($sp)
 	sw $a3,24($sp)
-	addiu $fp,$sp,28
+	addiu $fp,$sp,28#move frame pointer to previous stack pointer
 	
 	slt $t0, $a1, $a2#compare left and right
-	beq $t0,$zero, case1Part
-	sll $t1, $a1,2
-	add $t1, $a0, $t1
-	lw $t2, 0($t1)
+	beq $t0,$zero, case1Part#if left >= right go to case 1
+	sll $t1, $a1,2#a1*4
+	add $t1, $a0, $t1#address for a1
+	lw $t2, 0($t1)#load x[left] to t2
 	slt $t0, $a3, $t2#compare x[left] and pivot
-	bne $t0, $zero, case2Part
-	j else
+	bne $t0, $zero, case2Part#if this is true go to step 2
+	j else#if non of the above go to else
 case1Part:  
-	addi $v0, $a1,0
+	addi $v0, $a1,0#return left
 	j exitPart
 case2Part:	
-	addi $a2,$a2,-1
-	jal swap 
-	jal partition 
+	addi $a2,$a2,-1#right=right-1
+	jal swap #swap(x,left,right-1)
+	lw $a2, 20($sp)
+	addi $a2,$a2,-1#right =right-1
+	jal partition #partition(x,left,right,pivot)
 	j exitPart
-else:	addi $a1, $a1,1 
-	jal partition
-	lw $a1, 16($sp)
+else:	
+	lw $a1,16($sp)
+	lw $a2, 20($sp)
+	addi $a1, $a1,1 #left=left+1
+	jal partition#partition(x,left+1,right, pivot)
+	lw $a1, 16($sp)#clear a1
 
 exitPart:	lw $ra, 8($sp) # Push return address onto stack
-	lw $fp,4($sp)
-	lw $a0,12($sp)
+	lw $fp,4($sp)#push framepointer back
+	lw $a0,12($sp)#Push parameters back
 	lw $a1,16($sp)
 	lw $a2,20($sp)
 	lw $a3,24($sp)
-	addiu $sp, $sp, 28
+	addiu $sp, $sp, 28#reconstruct stack pointer
 	# r eturn to caller
 	jr $ra
-	########################################
-	#YET TO TEST
-	#########################################
+
 
 ########################
 #      quickSort       #
@@ -229,22 +231,23 @@ quickSort:
 	### INSERT YOUR CODE HERE
 	addiu $sp, $sp, -44 # Allocate space for return address
 	sw $ra, 8($sp) # Push return address onto stack
-	sw $fp,4($sp)
-	sw $a0,12($sp)
+	sw $fp,4($sp)#Push framepointer to stack
+	sw $a0,12($sp)#parameters a0-a2 on stack
 	sw $a1,16($sp)
 	sw $a2,20($sp)
-	sw $s0,24($sp)
+	sw $s0,24($sp)#push temporary values on stack
 	sw $s1,28($sp)
 	sw $s2,32($sp)
 	sw $s3,36($sp)
 	sw $s4,40($sp)
-	addiu $fp,$sp,44
+	addiu $fp,$sp,44#move framepointer
 	
-	addi $s2, $zero,2#temp register with value of 2
+	addi $s2, $zero,1#temp register with value of 2 because two elements mean a difference of 1
 	sub $s3, $a2, $a1# check the difference between the two indexes
-	slt $s4, $s3,$s2#if it is less than 2
+	slt $s4, $s3,$s2#if it is less than 1
 	bne $s4,$zero,exitQuick #exit the program because $t4 would be 0
 	
+
 	jal medianOfThree#step 2 
 	
 	lw $a1,16($sp)
@@ -257,15 +260,20 @@ quickSort:
 	lw $a2, 20($sp)
 	jal partition#partition(x,first+1,last, pivot)
 	addi $s3,$v0,-1# store the return value from partition to t3 and -1
+	sw $s3,36($sp)
 
 	addi $a2, $s3,0 
-	lw $a1,16($sp)#restore first
+
+	addi $a1,$a1,-1
 	jal swap#swap(x,first,index)
 	
-	addi $a2,$s3,-1 #index=index-1
 	lw $a1,16($sp)
+	lw $s3,36($sp)
+	addi $a2,$s3,-1 #index=index-1
 	jal quickSort#quickSort(x,first,index-1)
 	#last step
+	lw $s3,36($sp)
+
 	addi $a1, $s3,1#a1= index+1
 	lw $a2,20($sp)
 	jal quickSort#
