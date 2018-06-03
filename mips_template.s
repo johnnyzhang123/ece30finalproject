@@ -10,8 +10,7 @@
 
 
 .data 
-array:	.word 5 8 9 1 3 4 
-
+array:	.word 5, 8, 1, 9, 3, 4, 2, 6
 init:	.asciiz "The initial array is: "
 final:	.asciiz "The sorted array is: "
 comma:	.asciiz ", "
@@ -28,19 +27,19 @@ main:
 	# Print the array
 	la $a0,array
 	la $a1,init
-	li $a2,6
+	li $a2,8
 	jal printList
 
 	# Quicksort
 	la $a0,array
 	li $a1,0
-	li $a2,3
+	li $a2,7
 	jal quickSort
 
 	# Print the sorted array
 	la $a0,array
 	la $a1,final
-	li $a2,6
+	li $a2,8
 	jal printList
 
 
@@ -185,11 +184,11 @@ partition:
 	sw $a3,24($sp)
 	addiu $fp,$sp,28
 	
+	slt $t0, $a1, $a2#compare left and right
+	beq $t0,$zero, case1Part
 	sll $t1, $a1,2
 	add $t1, $a0, $t1
 	lw $t2, 0($t1)
-	slt $t0, $a1, $a2#compare left and right
-	beq $t0,$zero, case1Part
 	slt $t0, $a3, $t2#compare x[left] and pivot
 	bne $t0, $zero, case2Part
 	j else
@@ -200,7 +199,6 @@ case2Part:
 	addi $a2,$a2,-1
 	jal swap 
 	jal partition 
-	lw $a2, 20($sp)
 	j exitPart
 else:	addi $a1, $a1,1 
 	jal partition
@@ -229,7 +227,7 @@ quickSort:
 	# Sort the list using recursive quick sort using the above functions
 
 	### INSERT YOUR CODE HERE
-	addiu $sp, $sp, -40 # Allocate space for return address
+	addiu $sp, $sp, -44 # Allocate space for return address
 	sw $ra, 8($sp) # Push return address onto stack
 	sw $fp,4($sp)
 	sw $a0,12($sp)
@@ -238,10 +236,11 @@ quickSort:
 	sw $s0,24($sp)
 	sw $s1,28($sp)
 	sw $s2,32($sp)
-	sw $s4,36($sp)
-	addiu $fp,$sp,40
+	sw $s3,36($sp)
+	sw $s4,40($sp)
+	addiu $fp,$sp,44
 	
-	addi $s2, $zero,2# temp register with value of 2
+	addi $s2, $zero,2#temp register with value of 2
 	sub $s3, $a2, $a1# check the difference between the two indexes
 	slt $s4, $s3,$s2#if it is less than 2
 	bne $s4,$zero,exitQuick #exit the program because $t4 would be 0
@@ -258,7 +257,7 @@ quickSort:
 	lw $a2, 20($sp)
 	jal partition#partition(x,first+1,last, pivot)
 	addi $s3,$v0,-1# store the return value from partition to t3 and -1
-	
+
 	addi $a2, $s3,0 
 	lw $a1,16($sp)#restore first
 	jal swap#swap(x,first,index)
@@ -269,7 +268,7 @@ quickSort:
 	#last step
 	addi $a1, $s3,1#a1= index+1
 	lw $a2,20($sp)
-	jal quickSort
+	jal quickSort#
 exitQuick:
 	lw $ra, 8($sp) # Push return address onto stack
 	lw $fp,4($sp)
@@ -279,8 +278,9 @@ exitQuick:
 	lw $s0,24($sp)
 	lw $s1,28($sp)
 	lw $s2,32($sp)
-	lw $s4,36($sp)
-	addiu $sp,$sp,40
+	lw $s3,36($sp)
+	lw $s4,40($sp)
+	addiu $sp,$sp,44
 
 
 	# return to caller
@@ -320,4 +320,3 @@ pnext:	addi $t0,$t0,4
 	la $a0,comma
 	syscall			# Print comma
 	j next
-
