@@ -67,9 +67,7 @@ swap:
 	sw $t3,0($t2)#store value in t3 to t2
 	# return to caller
 	jr $ra
-	##############################
-	#SWAP TEST SUCCESSFUL
-	#########################
+
 ########################
 #   medianOfThree      #
 ########################
@@ -169,9 +167,7 @@ case4Med:
 	addiu $sp, $sp, 24 #clear up stack and return everything in position for caller
 	# return to caller	
    jr $ra
-   ##############################################
-   #MEDIAN OF THREE TEST SUCCESSFUL
-   ##################################################
+
 
 ########################
 #      partition       #
@@ -306,9 +302,7 @@ exitQuick:
 	# return to caller
 	jr $ra
 
-	##########################################################
-	#QUICK SORT TEST FAILED
-	###########################################################
+
 ########################
 #      printList       #
 ########################
