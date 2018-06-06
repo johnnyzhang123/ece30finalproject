@@ -57,19 +57,18 @@ swap:
 	# Swap the elements at the given indices in the list
 
 	### INSERT YOUR CODE HERE
-	sll $t1,$a1,2  #multiply a1 by 4
-	sll $t2, $a2,2 #multiply a2 by 4
-	add $t1 $t1,$a0 #access the value that is stored in a1
-	add $t2, $t2,$a0# access value in a2
-	lw $t3,0($t1) #store value in t1 to t3
-	lw $t4,0($t2)# store value in t2 to t4
-	sw $t4,0($t1)#store value in t4 to t1
-	sw $t3,0($t2)#store value in t3 to t2
+	sll $t1,$a1,2  		#multiply a1 by 4
+	sll $t2, $a2,2 		#multiply a2 by 4
+	add $t1 $t1,$a0 	#access the value that is stored in a1
+	add $t2, $t2,$a0	#access value in a2
+	lw $t3,0($t1) 		#store value in t1 to t3
+	lw $t4,0($t2)		#store value in t2 to t4
+	sw $t4,0($t1)		#store value in t4 to t1
+	sw $t3,0($t2)		#store value in t3 to t2
 	# return to caller
 	jr $ra
-	##############################
-	#SWAP TEST SUCCESSFUL
-	#########################
+	
+	
 ########################
 #   medianOfThree      #
 ########################
@@ -157,9 +156,6 @@ case4Med:
 	addiu $sp, $sp, 24 #clear up stack and return everything in position for caller
 	# return to caller	
    jr $ra
-   ##############################################
-   #MEDIAN OF THREE TEST SUCCESSFUL
-   ##################################################
 
 ########################
 #      partition       #
@@ -294,9 +290,6 @@ exitQuick:
 	# return to caller
 	jr $ra
 
-	##########################################################
-	#QUICK SORT TEST FAILED
-	###########################################################
 ########################
 #      printList       #
 ########################
