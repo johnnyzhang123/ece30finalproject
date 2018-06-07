@@ -5,7 +5,7 @@
 ######################
 
 # Partner1: Jianing Zhang A13596884
-# Partner2: Tsz Hang Lee A13226270
+# Partner2: TszHang Lee A13226270
 
 
 
