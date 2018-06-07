@@ -59,7 +59,7 @@ swap:
 	### INSERT YOUR CODE HERE
 	sll $t1,$a1,2		#multiply a1 by 4
 	sll $t2,$a2,2 		#multiply a2 by 4
-	add $t1$t1,$a0 		#access the value that is stored in a1
+	add $t1,$t1,$a0 		#access the value that is stored in a1
 	add $t2,$t2,$a0		#access value in a2
 	lw $t3,0($t1) 		#store value in t1 to t3
 	lw $t4,0($t2)		#store value in t2 to t4
